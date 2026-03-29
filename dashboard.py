@@ -1,3 +1,4 @@
+cat > dashboard.py << 'EOF'
 import os
 import ssl
 from datetime import timedelta
@@ -98,7 +99,6 @@ def formato_py_decimal(numero, decimales=1):
 
 
 def obtener_credentials(scopes):
-    # Primero intenta usar secrets de Streamlit Cloud
     try:
         if "google_service_account" in st.secrets:
             return Credentials.from_service_account_info(
@@ -108,7 +108,6 @@ def obtener_credentials(scopes):
     except Exception:
         pass
 
-    # Si no hay secrets, usa archivo local
     return Credentials.from_service_account_file(JSON_PATH, scopes=scopes)
 
 
