@@ -97,6 +97,21 @@ def formato_py_decimal(numero, decimales=1):
     return texto
 
 
+def obtener_credentials(scopes):
+    # Primero intenta usar secrets de Streamlit Cloud
+    try:
+        if "google_service_account" in st.secrets:
+            return Credentials.from_service_account_info(
+                dict(st.secrets["google_service_account"]),
+                scopes=scopes,
+            )
+    except Exception:
+        pass
+
+    # Si no hay secrets, usa archivo local
+    return Credentials.from_service_account_file(JSON_PATH, scopes=scopes)
+
+
 # =========================================
 # DATA
 # =========================================
@@ -107,7 +122,7 @@ def cargar_datos():
         "https://www.googleapis.com/auth/drive.readonly",
     ]
 
-    creds = Credentials.from_service_account_file(JSON_PATH, scopes=scopes)
+    creds = obtener_credentials(scopes)
     client = gspread.authorize(creds)
     worksheet = client.open_by_key(SHEET_ID).worksheet(WORKSHEET_NAME)
 
@@ -388,7 +403,6 @@ if productos_prioritarios:
 # =========================================
 st.subheader("Clientes")
 
-# nombres visibles por cliente normalizado
 mapa_clientes = (
     df_filtrado.groupby("Cliente_normalizado", as_index=False)["Cliente"]
     .first()
