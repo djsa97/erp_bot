@@ -1,4 +1,3 @@
-cat > dashboard.py << 'EOF'
 import os
 import ssl
 from datetime import timedelta
