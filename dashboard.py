@@ -21,10 +21,6 @@ st.set_page_config(
 # =========================================
 # CONFIG BASE
 # =========================================
-JSON_PATH = os.getenv(
-    "GOOGLE_SERVICE_ACCOUNT_JSON",
-    "/Users/diegosoljancic/Downloads/automatizacion-sol-huevos-2-f02d718cb7d4.json",
-)
 SHEET_ID = os.getenv(
     "GOOGLE_SHEET_ID",
     "1pLeNHeCQnlbTj-dIat7LajVLZNVIDC5eeEzhyBssz7U",
@@ -98,16 +94,10 @@ def formato_py_decimal(numero, decimales=1):
 
 
 def obtener_credentials(scopes):
-    try:
-        if "google_service_account" in st.secrets:
-            return Credentials.from_service_account_info(
-                dict(st.secrets["google_service_account"]),
-                scopes=scopes,
-            )
-    except Exception:
-        pass
-
-    return Credentials.from_service_account_file(JSON_PATH, scopes=scopes)
+    return Credentials.from_service_account_info(
+        dict(st.secrets["google_service_account"]),
+        scopes=scopes,
+    )
 
 
 # =========================================
