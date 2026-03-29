@@ -1,12 +1,9 @@
-import os
 import ssl
 from datetime import timedelta
 
-import gspread
 import pandas as pd
 import plotly.express as px
 import streamlit as st
-from google.oauth2.service_account import Credentials
 
 # =========================================
 # BYPASS SSL
@@ -21,11 +18,7 @@ st.set_page_config(
 # =========================================
 # CONFIG BASE
 # =========================================
-SHEET_ID = os.getenv(
-    "GOOGLE_SHEET_ID",
-    "1pLeNHeCQnlbTj-dIat7LajVLZNVIDC5eeEzhyBssz7U",
-)
-WORKSHEET_NAME = os.getenv("GOOGLE_WORKSHEET_NAME", "Hoja 1")
+GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1pLeNHeCQnlbTj-dIat7LajVLZNVIDC5eeEzhyBssz7U/export?format=csv&gid=0"
 
 PRODUCTOS_PRIORITARIOS_DEFAULT = [
     "BATATA",
@@ -93,29 +86,12 @@ def formato_py_decimal(numero, decimales=1):
     return texto
 
 
-def obtener_credentials(scopes):
-    return Credentials.from_service_account_info(
-        dict(st.secrets["google_service_account"]),
-        scopes=scopes,
-    )
-
-
 # =========================================
 # DATA
 # =========================================
 @st.cache_data(ttl=300)
 def cargar_datos():
-    scopes = [
-        "https://www.googleapis.com/auth/spreadsheets.readonly",
-        "https://www.googleapis.com/auth/drive.readonly",
-    ]
-
-    creds = obtener_credentials(scopes)
-    client = gspread.authorize(creds)
-    worksheet = client.open_by_key(SHEET_ID).worksheet(WORKSHEET_NAME)
-
-    valores = worksheet.get_all_records()
-    df = pd.DataFrame(valores)
+    df = pd.read_csv(GOOGLE_SHEET_CSV_URL)
 
     if df.empty:
         return df
