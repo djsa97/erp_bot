@@ -259,7 +259,7 @@ fig_evol.update_layout(
     yaxis_tickformat=",.0f",
 )
 
-st.plotly_chart(fig_evol, use_container_width=True)
+st.plotly_chart(fig_evol, use_container_width=True, key="fig_evol")
 
 # =========================================
 # PRODUCTOS
@@ -314,7 +314,7 @@ with col_a:
         margin=dict(l=10, r=40, t=10, b=10),
     )
     fig_top.update_xaxes(tickformat=",.0f")
-    st.plotly_chart(fig_top, use_container_width=True)
+    st.plotly_chart(fig_top, use_container_width=True, key="fig_top_productos")
 
 with col_b:
     st.markdown("**Productos que más subieron / bajaron vs semana anterior**")
@@ -347,7 +347,7 @@ with col_b:
         margin=dict(l=10, r=40, t=10, b=10),
     )
     fig_delta.update_xaxes(tickformat=",.0f")
-    st.plotly_chart(fig_delta, use_container_width=True)
+    st.plotly_chart(fig_delta, use_container_width=True, key="fig_delta_productos")
 
 if productos_prioritarios:
     st.markdown("**Comparación semanal de productos prioritarios**")
@@ -428,7 +428,7 @@ with cx1:
         margin=dict(l=10, r=40, t=10, b=10),
     )
     fig_clientes.update_xaxes(tickformat=",.0f")
-    st.plotly_chart(fig_clientes, use_container_width=True)
+    st.plotly_chart(fig_clientes, use_container_width=True, key="fig_clientes")
 
 with cx2:
     st.markdown("**Clientes que más subieron**")
@@ -459,7 +459,7 @@ with cx2:
             margin=dict(l=10, r=40, t=10, b=10),
         )
         fig_suben.update_xaxes(tickformat=",.0f")
-        st.plotly_chart(fig_suben, use_container_width=True)
+        st.plotly_chart(fig_suben, use_container_width=True, key="fig_clientes_suben")
     else:
         st.info("No hubo clientes con suba en esta semana.")
 
@@ -491,7 +491,7 @@ with cx3:
             margin=dict(l=10, r=40, t=10, b=10),
         )
         fig_bajan.update_xaxes(tickformat=",.0f")
-        st.plotly_chart(fig_bajan, use_container_width=True)
+        st.plotly_chart(fig_bajan, use_container_width=True, key="fig_clientes_bajan")
     else:
         st.info("No hubo clientes con baja en esta semana.")
 
@@ -548,7 +548,7 @@ with vx1:
             margin=dict(l=10, r=40, t=10, b=10),
         )
         fig_vendedora_venta.update_xaxes(tickformat=",.0f")
-        st.plotly_chart(fig_vendedora_venta, use_container_width=True)
+        st.plotly_chart(fig_vendedora_venta, use_container_width=True, key="fig_vendedora_venta")
     else:
         st.info("No hay datos para esta semana.")
 
@@ -579,7 +579,7 @@ with vx2:
             margin=dict(l=10, r=40, t=10, b=10),
         )
         fig_vendedora_clientes.update_xaxes(tickformat=",.0f")
-        st.plotly_chart(fig_vendedora_clientes, use_container_width=True)
+        st.plotly_chart(fig_vendedora_clientes, use_container_width=True, key="fig_vendedora_clientes")
     else:
         st.info("No hay datos para esta semana.")
 
