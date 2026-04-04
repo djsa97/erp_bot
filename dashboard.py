@@ -89,12 +89,14 @@ def formato_py_decimal(numero, decimales=1):
 # =========================================
 # DATA
 # =========================================
-@st.cache_data(ttl=300)
+@st.cache_data(ttl=30)
 def cargar_datos():
     df = pd.read_csv(GOOGLE_SHEET_CSV_URL)
 
     if df.empty:
         return df
+
+    df.columns = [str(c).strip() for c in df.columns]
 
     columnas_esperadas = ["Fecha entrega", "Cliente", "Producto", "Total producto"]
     faltantes = [c for c in columnas_esperadas if c not in df.columns]
@@ -132,6 +134,22 @@ st.title("Dashboard semanal de reparto")
 if df.empty:
     st.warning("La hoja está vacía o no se pudieron cargar datos.")
     st.stop()
+
+# =========================================
+# DIAGNÓSTICO
+# =========================================
+with st.expander("Diagnóstico de lectura"):
+    st.write("Columnas detectadas:", df.columns.tolist())
+    st.write("Primeras 10 filas:")
+    st.dataframe(df.head(10), use_container_width=True, hide_index=True)
+
+    if "Vendedora" in df.columns:
+        st.write("Primeros valores de Vendedora:")
+        st.write(df["Vendedora"].head(20).tolist())
+        st.write("Valores únicos de Vendedora:")
+        st.write(sorted(df["Vendedora"].dropna().astype(str).str.strip().unique().tolist()))
+    else:
+        st.write("No existe la columna Vendedora")
 
 # =========================================
 # SIDEBAR
