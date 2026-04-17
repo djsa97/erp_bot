@@ -89,6 +89,8 @@ def formato_py_decimal(numero, decimales=1):
 # =========================================
 # DATA
 # =========================================
+PRODUCTO_DASHBOARD_COL = "Producto_base"
+
 @st.cache_data(ttl=30)
 def cargar_datos():
     df = pd.read_csv(GOOGLE_SHEET_CSV_URL)
@@ -110,6 +112,11 @@ def cargar_datos():
     df["Total producto"] = pd.to_numeric(df["Total producto"], errors="coerce").fillna(0)
     df["Cliente"] = df["Cliente"].astype(str).str.strip()
     df["Producto"] = df["Producto"].astype(str).str.strip()
+    if "Producto dashboard" in df.columns:
+        df["Producto dashboard"] = df["Producto dashboard"].fillna("").astype(str).str.strip()
+        df[PRODUCTO_DASHBOARD_COL] = df["Producto dashboard"]
+    else:
+        df[PRODUCTO_DASHBOARD_COL] = df["Producto"]
     df["Vendedora"] = df["Vendedora"].fillna("").astype(str).str.strip()
     df["Cliente_normalizado"] = df["Cliente"].apply(normalizar_cliente)
 
@@ -185,8 +192,8 @@ vendedoras_sel = st.sidebar.multiselect(
 
 productos_prioritarios = st.sidebar.multiselect(
     "Productos prioritarios",
-    sorted(df["Producto"].dropna().unique().tolist()),
-    default=[p for p in PRODUCTOS_PRIORITARIOS_DEFAULT if p in df["Producto"].unique()],
+    sorted([p for p in df[PRODUCTO_DASHBOARD_COL].dropna().unique().tolist() if str(p).strip()]),
+    default=[p for p in PRODUCTOS_PRIORITARIOS_DEFAULT if p in df[PRODUCTO_DASHBOARD_COL].unique()],
 )
 
 df_filtrado = df.copy()
@@ -285,15 +292,15 @@ st.plotly_chart(fig_evol, use_container_width=True, key="fig_evol")
 st.subheader("Productos")
 
 prod_actual = (
-    actual.groupby("Producto", as_index=False)["Total producto"]
+    actual[actual[PRODUCTO_DASHBOARD_COL].astype(str).str.strip() != ""].groupby(PRODUCTO_DASHBOARD_COL, as_index=False)["Total producto"]
     .sum()
-    .rename(columns={"Total producto": "Actual"})
+    .rename(columns={PRODUCTO_DASHBOARD_COL: "Producto", "Total producto": "Actual"})
 )
 
 prod_prev = (
-    anterior.groupby("Producto", as_index=False)["Total producto"]
+    anterior[anterior[PRODUCTO_DASHBOARD_COL].astype(str).str.strip() != ""].groupby(PRODUCTO_DASHBOARD_COL, as_index=False)["Total producto"]
     .sum()
-    .rename(columns={"Total producto": "Anterior"})
+    .rename(columns={PRODUCTO_DASHBOARD_COL: "Producto", "Total producto": "Anterior"})
 )
 
 comparacion_prod = prod_actual.merge(prod_prev, on="Producto", how="outer").fillna(0)
@@ -370,10 +377,10 @@ with col_b:
 if productos_prioritarios:
     st.markdown("**Comparación semanal de productos prioritarios**")
     pivote_prioritarios = (
-        df_filtrado[df_filtrado["Producto"].isin(productos_prioritarios)]
-        .groupby(["Semana_label", "Producto"], as_index=False)["Total producto"]
+        df_filtrado[(df_filtrado[PRODUCTO_DASHBOARD_COL].astype(str).str.strip() != "") & (df_filtrado[PRODUCTO_DASHBOARD_COL].isin(productos_prioritarios))]
+        .groupby(["Semana_label", PRODUCTO_DASHBOARD_COL], as_index=False)["Total producto"]
         .sum()
-        .pivot(index="Semana_label", columns="Producto", values="Total producto")
+        .pivot(index="Semana_label", columns=PRODUCTO_DASHBOARD_COL, values="Total producto")
         .fillna(0)
         .sort_index()
     )
